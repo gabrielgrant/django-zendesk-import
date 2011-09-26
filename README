@@ -1,0 +1,36 @@
+Django Zendesk Import brings zendesk data into your django database so it
+can be linked against your existing Django users and be used in other
+apps. At the moment, only import of zendesk data into Askbot is implemented,
+but import into django-helpdesk should be written.
+
+The import process is quite database-intensive, so I suggest doing
+a dump of your User models so processing can happen offline:
+
+    python manage.py dumpdata --indent=4 auth.User > ../static/dump
+
+You can then use the sample project to do the import and match:
+
+    cd sample_project
+    rm -rf /tmp/zendesk_import.db
+    python manage.py syncdb
+    python manage.py loaddata ../user_dump.json
+    python manage.py load_zendesk_data  ../zendesk_data/
+    python manage.py match_zendesk_users
+
+
+To start over, you can:
+
+    python manage.py reset zendesk_import
+
+And if you are importing into askbot, do:
+
+    python manage.py askbot_import_from_zendesk
+
+The askbot import looks for a `ASKBOT_IMPORT_FROM_ZENDESK_DEFAULT_USER_ID`
+setting defining to which user questions or answers should be assigned if
+the zendesk user cannot be found in among the Django users. If the setting
+is missing, Entries and Posts with unknown users will be dropped.
+
+At the moment, Zendesk does not appear to export vote information, so
+vote counts will not be imported. I have submitted a support request
+with Zendesk to have this info included, but haven't received any timeline.
