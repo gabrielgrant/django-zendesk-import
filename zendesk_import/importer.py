@@ -14,26 +14,33 @@ class XMLImporter(object):
         self.field_name_conversions = field_name_conversions
         self.model = model
 
-    def do_import(self):
+    def do_list_import(self):
         xml_doc = parse(self.xml_file)
         models = []
         for c in xml_doc.getroot().getchildren():
-            m = self.model()
-            for xml_field in c.getchildren():
-                model_field_name = self.convert_tag_name(xml_field.tag)
-                if hasattr(m, model_field_name):
-                    val = self.convert_tag_value(xml_field) 
-                    setattr(m, model_field_name, val)
-            try:
-                m.save()
-            except:
-                # print extra debug info
-                from StringIO import StringIO
-                print m, [(f, getattr(m, f.name)) for f in m._meta.fields]
-                print etree_tostring(c)
-                raise
-            models.append(m)
+            models.append(self.import_child(c))
         return models
+
+    def do_single_import(self):
+        xml_doc = parse(self.xml_file)
+        return self.import_child(xml_doc.getroot())
+
+    def import_child(self, c)
+        m = self.model()
+        for xml_field in c.getchildren():
+            model_field_name = self.convert_tag_name(xml_field.tag)
+            if hasattr(m, model_field_name):
+                val = self.convert_tag_value(xml_field)
+                setattr(m, model_field_name, val)
+        try:
+            m.save()
+        except:
+            # print extra debug info
+            from StringIO import StringIO
+            print m, [(f, getattr(m, f.name)) for f in m._meta.fields]
+            print etree_tostring(c)
+            raise
+        return m
 
     def convert_tag_name(self, name):
         converted_name = self.field_name_conversions.get(name, name)
