@@ -25,7 +25,7 @@ class XMLImporter(object):
         xml_doc = parse(self.xml_file)
         return self.import_child(xml_doc.getroot())
 
-    def import_child(self, c)
+    def import_child(self, c):
         m = self.model()
         for xml_field in c.getchildren():
             model_field_name = self.convert_tag_name(xml_field.tag)
