@@ -1,6 +1,6 @@
 import sys
 import os.path
-from xml.etree.ElementTree import parse
+from xml.etree.ElementTree import parse, tostring as etree_tostring
 import iso8601
 from glob import glob
 from zendesk_import import models as zd_models
@@ -28,7 +28,9 @@ class XMLImporter(object):
                 m.save()
             except:
                 # print extra debug info
+                from StringIO import StringIO
                 print m, [(f, getattr(m, f.name)) for f in m._meta.fields]
+                print etree_tostring(c)
                 raise
             models.append(m)
         return models
