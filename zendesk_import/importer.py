@@ -24,7 +24,12 @@ class XMLImporter(object):
                 if hasattr(m, model_field_name):
                     val = self.convert_tag_value(xml_field) 
                     setattr(m, model_field_name, val)
-            m.save()
+            try:
+                m.save()
+            except:
+                # print extra debug info
+                print m, [(f, getattr(m, f.name)) for f in m._meta.fields]
+                raise
             models.append(m)
         return models
 
