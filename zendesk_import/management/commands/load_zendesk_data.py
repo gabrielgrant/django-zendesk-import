@@ -14,7 +14,7 @@ class Command(BaseCommand):
                 'Exaclty one argument is needed: the path to the Zendesk data')
         base_path = args[0]
         # account is a special case, because there is only one object in the dump
-        self.stdout.write('\nImporting %s models Account\n')
+        self.stdout.write('\nImporting Account models\n')
         xml_filename = os.path.join(base_path, 'accounts.xml')
         XMLImporter(xml_filename, zd_models.Account).do_single_import()
         model_names = 'Organization, User, Forum, Entry, Post'.split(', ')
